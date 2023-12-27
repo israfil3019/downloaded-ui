@@ -1,501 +1,468 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Layout</title>
-  <style>
-    .react-grid-layout {
-      position: relative;
-      transition: height 200ms ease;
-    }
-
-    .react-grid-item {
-      transition: all 200ms ease;
-      transition-property: none;
-    }
-
-    .react-grid-item img {
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .react-grid-item.cssTransforms {
-      transition-property: none;
-    }
-
-    .react-grid-item.resizing {
-      transition: none;
-      z-index: 1;
-      will-change: width, height;
-    }
-
-    .react-grid-item.react-draggable-dragging {
-      transition: none;
-      z-index: 3;
-    }
-
-    .react-grid-item.dropping {
-      visibility: hidden;
-    }
-
-    .react-grid-item.react-grid-placeholder {
-      background: red;
-      opacity: 0.2;
-      transition-duration: 100ms;
-      z-index: 2;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -o-user-select: none;
-      user-select: none;
-    }
-
-    .react-grid-item.react-grid-placeholder.placeholder-resizing {
-      transition: none;
-    }
-
-    .react-grid-item>.react-resizable-handle {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-    }
-
-    .react-grid-item>.react-resizable-handle::after {
-      content: "";
-      position: absolute;
-      right: 3px;
-      bottom: 3px;
-      width: 5px;
-      height: 5px;
-      border-right: 2px solid rgba(0, 0, 0, 0.4);
-      border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-    }
-
-    .react-resizable-hide>.react-resizable-handle {
-      display: none;
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-sw {
-      bottom: 0;
-      left: 0;
-      cursor: sw-resize;
-      transform: rotate(90deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-se {
-      bottom: 0;
-      right: 0;
-      cursor: se-resize;
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-nw {
-      top: 0;
-      left: 0;
-      cursor: nw-resize;
-      transform: rotate(180deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-ne {
-      top: 0;
-      right: 0;
-      cursor: ne-resize;
-      transform: rotate(270deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-w,
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-e {
-      top: 50%;
-      margin-top: -10px;
-      cursor: ew-resize;
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-w {
-      left: 0;
-      transform: rotate(135deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-e {
-      right: 0;
-      transform: rotate(315deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-n,
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-s {
-      left: 50%;
-      margin-left: -10px;
-      cursor: ns-resize;
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-n {
-      top: 0;
-      transform: rotate(225deg);
-    }
-
-    .react-grid-item>.react-resizable-handle.react-resizable-handle-s {
-      bottom: 0;
-      transform: rotate(45deg);
-    }
-
-    body {
-      padding: 20px;
-    }
-
-    #content {
-      width: 100%;
-    }
-
-    .react-grid-layout {
-      background: #eee;
-      margin-top: 10px;
-    }
-
-    .layoutJSON {
-      background: #ddd;
-      border: 1px solid black;
-      margin-top: 10px;
-      padding: 10px;
-    }
-
-    .columns {
-      -moz-columns: 120px;
-      -webkit-columns: 120px;
-      columns: 120px;
-    }
-
-    .react-grid-item {
-      box-sizing: border-box;
-      margin: 0;
-    }
-
-    .react-grid-item:not(.react-grid-placeholder) {
-      background: transparent;
-      border: 1px solid black;
-    }
-
-    .react-grid-item.resizing {
-      opacity: 0.9;
-    }
-
-    .react-grid-item.static {
-      background: #cce;
-    }
-
-    .react-grid-item .minMax {
-      font-size: 12px;
-    }
-
-    .react-grid-item .add {
-      cursor: pointer;
-    }
-
-    .react-grid-dragHandleExample {
-      cursor: move;
-      /* fallback if grab cursor is unsupported */
-      cursor: grab;
-      cursor: -moz-grab;
-      cursor: -webkit-grab;
-    }
-
-    .toolbox {
-      background-color: #dfd;
-      width: 100%;
-      height: 120px;
-      overflow: scroll;
-    }
-
-    .hide-button {
-      cursor: pointer;
-      position: absolute;
-      font-size: 20px;
-      top: 0px;
-      right: 5px;
-    }
-
-    .toolbox__title {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-
-    .toolbox__items {
-      display: block;
-    }
-
-    .toolbox__items__item {
-      display: inline-block;
-      text-align: center;
-      line-height: 40px;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid black;
-      background-color: #ddd;
-    }
-
-    .droppable-element {
-      width: 150px;
-      text-align: center;
-      background: #fdd;
-      border: 1px solid black;
-      margin: 10px 0;
-      padding: 10px;
-    }
-
-    .form-control {
-      border: none;
-      background-color: transparent;
-      margin: 0;
-      width: 65% !important;
-    }
-
-    .form-check-input:checked[type="checkbox"] {
-      background-color: #0b31f8;
-      border-color: #0b31f8;
-    }
-
-    .form-range {
-      border: none;
-      padding: 0.375rem 0.75rem;
-    }
-
-    .form-control-toggle {
-      border: none;
-      background-color: transparent;
-      margin: 0 8px;
-      font-weight: 900;
-      width: 24px;
-    }
-
-    .form-control-toggle.active {
-      background-color: #fdd;
-      border-radius: 4px;
-    }
-
-    .form-control-toggle--underline {
-      text-decoration: underline;
-    }
-
-    .form-control-toggle--italic {
-      font-style: italic;
-    }
-
-    .change-icon {
-      cursor: pointer;
-      margin-left: 5px;
-    }
-
-    .dynamic-wrapper {
-      display: flex;
-      width: 100%;
-      justify-content: space-between;
-      max-height: 862px;
-    }
-
-    .dynamic-layout-wrapper {
-      display: flex;
-      position: relative;
-      overflow: hidden scroll;
-      margin-top: 4rem;
-    }
-
-    .dynamic-layout {
-      background-size: cover;
-      background-repeat: no-repeat;
-      box-sizing: content-box;
-      border-radius: 1rem;
-      position: relative;
-      height: 830px;
-      width: 600px;
-    }
-
-    .dynamic-wrapper .bg-wrapper {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-    }
-
-    .dynamic-wrapper .bg-wrapper img {
-      width: 100%;
-    }
-
-    .dynamic-button-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      width: 300px;
-      background-color: white;
-      box-shadow: 14px 13px 32px -10px rgba(140, 138, 138, 0.25);
-      box-shadow: 8px 5px 8px 0px #8c8a8a40;
-    }
-
-    .dynamic-button-wrapper button {
-      border: 3px solid #8060cb;
-      margin: 1rem;
-      padding: 12px 16px;
-      font-weight: 600;
-      color: #8060cb;
-      border-radius: 1rem;
-      background-color: #ede5ff;
-    }
-
-    .dynamic-zoom-wrapper button {
-      border: 3px solid #8060cb;
-      padding: 4px 8px;
-      font-weight: 600;
-      color: #8060cb;
-      border-radius: 1rem;
-      background-color: #ede5ff;
-    }
-
-    .dynamic-button-wrapper button {
-      border: 3px solid #8060cb;
-      margin: 1rem;
-      padding: 12px 16px;
-      font-weight: 600;
-      color: #8060cb;
-      border-radius: 1rem;
-      background-color: #ede5ff;
-    }
-
-    .dynamic-zoom-wrapper button:disabled {
-      border: 3px solid #797979;
-      color: #797979;
-    }
-
-    .url-input-container {
-      display: flex;
-      align-items: center;
-      position: relative;
-    }
-
-    .url-input-container input {
-      border: 2px solid #7b2cbf;
-      background-color: white;
-      border-radius: 26px;
-      padding-left: 8px;
-      height: 44px;
-    }
-
-    .url-input-container .error-message {
-      position: absolute;
-      bottom: -16px;
-      font-size: 14px;
-      color: red;
-    }
-
-    .layout-page {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .styling-wrapper {
-      width: 300px;
-      background-color: white;
-      padding: 1rem;
-      overflow: hidden auto;
-      box-shadow: -8px 5px 8px 0px #8c8a8a40;
-    }
-
-    .style-group {
-      display: flex;
-      align-items: center;
-    }
-
-    .style-group label {
-      padding: 0.375rem 0.75rem;
-      font-size: 1rem;
-      font-weight: 400;
-      line-height: 1.5;
-      color: #212529;
-      width: 100%;
-    }
-
-    .button-item-edit {
-      position: absolute;
-      top: -24px;
-      right: 24px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .react-grid-item textarea {
-      text-indent: 24px;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      resize: none;
-      overflow: hidden;
-      background: transparent;
-      border: none;
-      outline: none;
-    }
-
-    .react-grid-item .remove-button {
-      cursor: pointer;
-      position: absolute;
-      font-size: 16px;
-      top: -24px;
-      right: 0px;
-      z-index: 2;
-    }
-
-    .react-grid-item li {
-      position: relative;
-    }
-
-    .react-grid-item .list-remove-button {
-      position: absolute;
-      right: 0;
-      top: 5px;
-      cursor: pointer;
-    }
-
-    .react-grid-item ul .button-link {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      background-color: #0b31f8;
-      color: #fff;
-      position: relative;
-      top: 4px;
-      border-radius: 2px;
-    }
-
-    .react-grid-item .checkbox {
-      cursor: pointer;
-      position: absolute;
-      font-size: 16px;
-      top: 0;
-      left: 4px;
-      z-index: 2;
-    }
-  </style>
-</head>
-
-<body style="margin:6rem">
-  <div class="react-grid-layout layout" style="
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Your Layout</title>
+          <style>
+          
+  .react-grid-layout {
+    position: relative;
+    transition: height 200ms ease;
+  }
+  .react-grid-item {
+    transition: all 200ms ease;
+    transition-property: none;
+  }
+  .react-grid-item img {
+    pointer-events: none;
+    user-select: none;
+  }
+  .react-grid-item.cssTransforms {
+    transition-property: none;
+  }
+  .react-grid-item.resizing {
+    transition: none;
+    z-index: 1;
+    will-change: width, height;
+  }
+  .react-grid-item.react-draggable-dragging {
+    transition: none;
+    z-index: 3;
+  }
+  .react-grid-item.dropping {
+    visibility: hidden;
+  }
+  .react-grid-item.react-grid-placeholder {
+    background: red;
+    opacity: 0.2;
+    transition-duration: 100ms;
+    z-index: 2;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  }
+  .react-grid-item.react-grid-placeholder.placeholder-resizing {
+    transition: none;
+  }
+  .react-grid-item > .react-resizable-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+  }
+  .react-grid-item > .react-resizable-handle::after {
+    content: "";
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 5px;
+    height: 5px;
+    border-right: 2px solid rgba(0, 0, 0, 0.4);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  }
+  .react-resizable-hide > .react-resizable-handle {
+    display: none;
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-sw {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+    transform: rotate(90deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-nw {
+    top: 0;
+    left: 0;
+    cursor: nw-resize;
+    transform: rotate(180deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-ne {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+    transform: rotate(270deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-w,
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-e {
+    top: 50%;
+    margin-top: -10px;
+    cursor: ew-resize;
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-w {
+    left: 0;
+    transform: rotate(135deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-e {
+    right: 0;
+    transform: rotate(315deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-n,
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-s {
+    left: 50%;
+    margin-left: -10px;
+    cursor: ns-resize;
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-n {
+    top: 0;
+    transform: rotate(225deg);
+  }
+  .react-grid-item > .react-resizable-handle.react-resizable-handle-s {
+    bottom: 0;
+    transform: rotate(45deg);
+  }
+  #content {
+    width: 100%;
+  }
+  .react-grid-layout {
+    background: #eee;
+    margin-top: 10px;
+  }
+  .layoutJSON {
+    background: #ddd;
+    border: 1px solid black;
+    margin-top: 10px;
+    padding: 10px;
+  }
+  .columns {
+    -moz-columns: 120px;
+    -webkit-columns: 120px;
+    columns: 120px;
+  }
+  .react-grid-item {
+    box-sizing: border-box;
+    margin: 0;
+  }
+  .react-grid-item:not(.react-grid-placeholder) {
+    background: transparent;
+    border: 1px solid black;
+  }
+  .react-grid-item.resizing {
+    opacity: 0.9;
+  }
+  .react-grid-item.static {
+    background: #cce;
+  }
+  .react-grid-item .minMax {
+    font-size: 12px;
+  }
+  .react-grid-item .add {
+    cursor: pointer;
+  }
+  .react-grid-dragHandleExample {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+  .toolbox {
+    background-color: #dfd;
+    width: 100%;
+    height: 120px;
+    overflow: scroll;
+  }
+  .hide-button {
+    cursor: pointer;
+    position: absolute;
+    font-size: 20px;
+    top: 0px;
+    right: 5px;
+  }
+  .toolbox__title {
+    font-size: 24px;
+    margin-bottom: 5px;
+  }
+  .toolbox__items {
+    display: block;
+  }
+  .toolbox__items__item {
+    display: inline-block;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid black;
+    background-color: #ddd;
+  }
+  .droppable-element {
+    width: 150px;
+    text-align: center;
+    background: #fdd;
+    border: 1px solid black;
+    margin: 10px 0;
+    padding: 10px;
+  }
+  .form-control {
+    border: none;
+    background-color: transparent;
+    margin: 0;
+    width: 65% !important;
+  }
+  .form-check-input:checked[type="checkbox"] {
+    background-color: #0b31f8;
+    border-color: #0b31f8;
+  }
+  .form-range {
+    border: none;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .form-control-toggle {
+    border: none;
+    background-color: transparent;
+    margin: 0 8px;
+    font-weight: 900;
+    width: 24px;
+  }
+  .form-control-toggle.active {
+    background-color: #fdd;
+    border-radius: 4px;
+  }
+  .form-control-toggle--underline {
+    text-decoration: underline;
+  }
+  .form-control-toggle--italic {
+    font-style: italic;
+  }
+  .change-icon {
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  
+  .dynamic-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    max-height: 862px;
+  }
+  .dynamic-layout-wrapper {
+    display: flex;
+    position: relative;
+    overflow: hidden scroll;
+    margin-top: 4rem;
+  }
+  .dynamic-layout {
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-sizing: content-box;
+    border-radius: 1rem;
+    position: relative;
+    height: 830px;
+    width: 600px;
+  }
+  .dynamic-wrapper .bg-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+  }
+  .dynamic-wrapper .bg-wrapper img {
+    width: 100%;
+  }
+  .dynamic-button-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 300px;
+    background-color: white;
+    box-shadow: 14px 13px 32px -10px rgba(140, 138, 138, 0.25);
+    box-shadow: 8px 5px 8px 0px #8c8a8a40;
+  }
+  .dynamic-button-wrapper button {
+    border: 3px solid #8060cb;
+    margin: 1rem;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: #8060cb;
+    border-radius: 1rem;
+    background-color: #ede5ff;
+  }
+  .dynamic-zoom-wrapper button {
+    border: 3px solid #8060cb;
+    padding: 4px 8px;
+    font-weight: 600;
+    color: #8060cb;
+    border-radius: 1rem;
+    background-color: #ede5ff;
+  }
+  .dynamic-button-wrapper button {
+    border: 3px solid #8060cb;
+    margin: 1rem;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: #8060cb;
+    border-radius: 1rem;
+    background-color: #ede5ff;
+  }
+  .dynamic-zoom-wrapper button:disabled {
+    border: 3px solid #797979;
+    color: #797979;
+  }
+  .url-input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .url-input-container input {
+    border: 2px solid #7b2cbf;
+    background-color: white;
+    border-radius: 26px;
+    padding-left: 8px;
+    height: 44px;
+  }
+  .url-input-container .error-message {
+    position: absolute;
+    bottom: -16px;
+    font-size: 14px;
+    color: red;
+  }
+  .layout-page {
+    display: flex;
+    justify-content: space-between;
+  }
+  .styling-wrapper {
+    width: 300px;
+    background-color: white;
+    padding: 1rem;
+    overflow: hidden auto;
+    box-shadow: -8px 5px 8px 0px #8c8a8a40;
+  }
+  .style-group {
+    display: flex;
+    align-items: center;
+  }
+  .style-group label {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    width: 100%;
+  }
+  .button-item-edit {
+    position: absolute;
+    top: -24px;
+    right: 24px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .react-grid-item textarea {
+    text-indent: 24px;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+  .react-grid-item .remove-button {
+    cursor: pointer;
+    position: absolute;
+    font-size: 16px;
+    top: -24px;
+    right: 0px;
+    z-index: 2;
+  }
+  .react-grid-item li {
+    position: relative;
+  }
+  .react-grid-item .list-remove-button {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    cursor: pointer;
+  }
+  .react-grid-item ul .button-link {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    background-color: #0b31f8;
+    color: #fff;
+    position: relative;
+    top: 4px;
+    border-radius: 2px;
+  }
+  .react-grid-item .checkbox {
+    cursor: pointer;
+    position: absolute;
+    font-size: 16px;
+    top: 0;
+    left: 4px;
+    z-index: 2;
+  }  
+  @media (max-width: 540px) {
+    .react-grid-layout{
+      width: 442px!important;
+      height: 255px!important;
+    }
+  }
+  
+  @media (max-width: 460px) {
+    .react-grid-layout{
+      width: 381px!important;
+      height: 220px!important;
+    }
+  }
+
+          </style>
+      </head>
+      <body style="margin:0"> 
+          <div class="react-grid-layout layout" style="
     background: #dac9ed;
     border-width: 5px;
     border-style:solid;
     border-color: #4c158e;
     border-radius: 14px;
+    margin:100px auto;
     width: 520px;
     height: 300px;
 ">
+              
+      <style>
+      
+        @media (max-width: 540px) {
+          .react-grid-item-1 {
+            left: calc((var(--x) * (442 / 12)) * 1px)!important;
+            top: calc((var(--y) * 8.5) * 1px)!important;
+            width: calc((var(--w) * (442 / 12)) * 1px)!important;
+            height: calc((var(--h) * 8.5) * 1px)!important;
+          }
+        }
 
-    <div class="react-grid-item" style="
+        @media (max-width: 460px) {
+          .react-grid-item-1 {
+            left: calc((var(--x) * (381 / 12)) * 1px)!important;
+            top: calc((var(--y) * 7.327) * 1px)!important;
+            width: calc((var(--w) * (381 / 12)) * 1px)!important;
+            height: calc((var(--h) * 7.327) * 1px)!important;
+          }
+        }
+    
+    </style>
+    <div class="react-grid-item react-grid-item-1" style="
+      --x: 0;
+      --y: 17;
+      --w: 3;
+      --h: 10;
         display: flex;
         position: absolute;
-        left: 0px;
-        top: 170px; 
-        width: 130px;
-        height: 100px;
+        left: calc((var(--x) * (520 / 12)) * 1px);
+        top: calc((var(--y) * 10) * 1px);
+        width: calc((var(--w) * (520 / 12)) * 1px);
+        height: calc((var(--h) * 10) * 1px);
         transform: translateY(0rem);
         background-color: rgba(NaN,
                                NaN,
@@ -517,25 +484,49 @@
         background-position-y: center;
         background-position-x: center;
       ">
-      <ul style="
+          <ul style="
         color: #fff;
         font-size: 18px;
         list-style: square;
         transform: rotateZ(0deg);
       ">
-        <li style=" margin: 0px 0;">item one</li>
-        <li style=" margin: 0px 0;">item two</li>
-      </ul>
-    </div>
+                  <li style=" margin: 0px 0;">item one</li><li style=" margin: 0px 0;">item two</li>
+                </ul>
+        </div>
+      
 
+      <style>
+      
+        @media (max-width: 540px) {
+          .react-grid-item-2 {
+            left: calc((var(--x) * (442 / 12)) * 1px)!important;
+            top: calc((var(--y) * 8.5) * 1px)!important;
+            width: calc((var(--w) * (442 / 12)) * 1px)!important;
+            height: calc((var(--h) * 8.5) * 1px)!important;
+          }
+        }
 
-    <div class="react-grid-item" style="
+        @media (max-width: 460px) {
+          .react-grid-item-2 {
+            left: calc((var(--x) * (381 / 12)) * 1px)!important;
+            top: calc((var(--y) * 7.327) * 1px)!important;
+            width: calc((var(--w) * (381 / 12)) * 1px)!important;
+            height: calc((var(--h) * 7.327) * 1px)!important;
+          }
+        }
+    
+    </style>
+    <div class="react-grid-item react-grid-item-2" style="
+      --x: 4;
+      --y: 0;
+      --w: 4;
+      --h: 12;
         display: flex;
         position: absolute;
-        left: 173.33333333333334px;
-        top: 0px; 
-        width: 173.33333333333334px;
-        height: 120px;
+        left: calc((var(--x) * (520 / 12)) * 1px);
+        top: calc((var(--y) * 10) * 1px);
+        width: calc((var(--w) * (520 / 12)) * 1px);
+        height: calc((var(--h) * 10) * 1px);
         transform: translateY(-3rem);
         background-color: rgba(NaN,
                                NaN,
@@ -557,21 +548,46 @@
         background-position-y: center;
         background-position-x: center;
       ">
-      <img src="https://picsum.photos/200" alt="Image" style="
+          <img src="https://picsum.photos/200" alt="Image" style="
         width: 100%;
         height: 100%;
         border-radius: 33px;
       " />
-    </div>
+        </div>
+      
 
+      <style>
+      
+        @media (max-width: 540px) {
+          .react-grid-item-3 {
+            left: calc((var(--x) * (442 / 12)) * 1px)!important;
+            top: calc((var(--y) * 8.5) * 1px)!important;
+            width: calc((var(--w) * (442 / 12)) * 1px)!important;
+            height: calc((var(--h) * 8.5) * 1px)!important;
+          }
+        }
 
-    <div class="react-grid-item" style="
+        @media (max-width: 460px) {
+          .react-grid-item-3 {
+            left: calc((var(--x) * (381 / 12)) * 1px)!important;
+            top: calc((var(--y) * 7.327) * 1px)!important;
+            width: calc((var(--w) * (381 / 12)) * 1px)!important;
+            height: calc((var(--h) * 7.327) * 1px)!important;
+          }
+        }
+    
+    </style>
+    <div class="react-grid-item react-grid-item-3" style="
+      --x: 0;
+      --y: 10;
+      --w: 12;
+      --h: 5;
         display: flex;
         position: absolute;
-        left: 0px;
-        top: 100px; 
-        width: 520px;
-        height: 50px;
+        left: calc((var(--x) * (520 / 12)) * 1px);
+        top: calc((var(--y) * 10) * 1px);
+        width: calc((var(--w) * (520 / 12)) * 1px);
+        height: calc((var(--h) * 10) * 1px);
         transform: translateY(0rem);
         background-color: rgba(193,
                                179,
@@ -593,17 +609,42 @@
         background-position-y: center;
         background-position-x: center;
       ">
-      <span style=" transform: rotateZ(0deg);">New 3</span>
-    </div>
+          <span style="transform: rotateZ(0deg);">New 3</span>
+        </div>
+      
 
+      <style>
+      
+        @media (max-width: 540px) {
+          .react-grid-item-4 {
+            left: calc((var(--x) * (442 / 12)) * 1px)!important;
+            top: calc((var(--y) * 8.5) * 1px)!important;
+            width: calc((var(--w) * (442 / 12)) * 1px)!important;
+            height: calc((var(--h) * 8.5) * 1px)!important;
+          }
+        }
 
-    <div class="react-grid-item" style="
+        @media (max-width: 460px) {
+          .react-grid-item-4 {
+            left: calc((var(--x) * (381 / 12)) * 1px)!important;
+            top: calc((var(--y) * 7.327) * 1px)!important;
+            width: calc((var(--w) * (381 / 12)) * 1px)!important;
+            height: calc((var(--h) * 7.327) * 1px)!important;
+          }
+        }
+    
+    </style>
+    <div class="react-grid-item react-grid-item-4" style="
+      --x: 10;
+      --y: 22;
+      --w: 2;
+      --h: 8;
         display: flex;
         position: absolute;
-        left: 433.33333333333337px;
-        top: 220px; 
-        width: 86.66666666666667px;
-        height: 80px;
+        left: calc((var(--x) * (520 / 12)) * 1px);
+        top: calc((var(--y) * 10) * 1px);
+        width: calc((var(--w) * (520 / 12)) * 1px);
+        height: calc((var(--h) * 10) * 1px);
         transform: translateY(0rem);
         background-color: rgba(NaN,
                                NaN,
@@ -625,17 +666,42 @@
         background-position-y: center;
         background-position-x: center;
       ">
-      <span style=" transform: rotateZ(270deg);">New 4</span>
-    </div>
+          <span style="transform: rotateZ(270deg);">New 4</span>
+        </div>
+      
 
+      <style>
+      
+        @media (max-width: 540px) {
+          .react-grid-item-5 {
+            left: calc((var(--x) * (442 / 12)) * 1px)!important;
+            top: calc((var(--y) * 8.5) * 1px)!important;
+            width: calc((var(--w) * (442 / 12)) * 1px)!important;
+            height: calc((var(--h) * 8.5) * 1px)!important;
+          }
+        }
 
-    <div class="react-grid-item" style="
+        @media (max-width: 460px) {
+          .react-grid-item-5 {
+            left: calc((var(--x) * (381 / 12)) * 1px)!important;
+            top: calc((var(--y) * 7.327) * 1px)!important;
+            width: calc((var(--w) * (381 / 12)) * 1px)!important;
+            height: calc((var(--h) * 7.327) * 1px)!important;
+          }
+        }
+    
+    </style>
+    <div class="react-grid-item react-grid-item-5" style="
+      --x: 8;
+      --y: 20;
+      --w: 4;
+      --h: 6;
         display: flex;
         position: absolute;
-        left: 346.6666666666667px;
-        top: 200px; 
-        width: 173.33333333333334px;
-        height: 60px;
+        left: calc((var(--x) * (520 / 12)) * 1px);
+        top: calc((var(--y) * 10) * 1px);
+        width: calc((var(--w) * (520 / 12)) * 1px);
+        height: calc((var(--h) * 10) * 1px);
         transform: translateY(0rem);
         background-color: rgba(212,
                                0,
@@ -657,10 +723,10 @@
         background-position-y: center;
         background-position-x: center;
       ">
-      <span style=" transform: rotateZ(90deg);">one</span>
-    </div>
-
-  </div>
-</body>
-
-</html>
+          <span style="transform: rotateZ(90deg);">one</span>
+        </div>
+      
+          </div>
+      </body>
+      </html>
+  
